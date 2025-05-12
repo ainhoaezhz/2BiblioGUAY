@@ -1,35 +1,39 @@
+
 #include "SocketCliente.h"
 #include "MenuAdmin.h"
 #include "MenuUsuario.h"
 #include <iostream>
+#include <string>
 
 int main() {
-    std::string ip;
-    int puerto;
-
-    std::cout << "Introduce la IP del servidor: ";
-    std::cin >> ip;
-    std::cout << "Introduce el puerto: ";
-    std::cin >> puerto;
-
-    SocketCliente cliente(ip, puerto);
+    SocketCliente cliente("127.0.0.1", 6000);
     if (!cliente.conectar()) {
         std::cerr << "No se pudo conectar al servidor.\n";
         return 1;
     }
 
-    int tipoUsuario;
-    std::cout << "¿Qué tipo de usuario eres? (1 = Admin, 2 = Usuario): ";
-    std::cin >> tipoUsuario;
+    std::string nombre, contrasena;
+    std::cin.ignore(); // limpiar buffer
 
-    if (tipoUsuario == 1) {
+    std::cout << "Nombre de usuario: ";
+    std::getline(std::cin, nombre);
+    std::cout << "Contraseña: ";
+    std::getline(std::cin, contrasena);
+
+    std::string comando = "INICIAR_SESION|" + nombre + "|" + contrasena;
+    cliente.enviarComando(comando);
+
+    std::string respuesta = cliente.recibirRespuesta();
+    std::cout << "Servidor: " << respuesta << "\n";
+
+    if (respuesta == "LOGIN_OK|ADMIN") {
         MenuAdmin menu;
         menu.mostrarMenu();
-    } else if (tipoUsuario == 2) {
+    } else if (respuesta == "LOGIN_OK|USUARIO") {
         MenuUsuario menu;
         menu.mostrarMenu();
     } else {
-        std::cout << "Tipo no válido.\n";
+        std::cout << "Inicio de sesión fallido.\n";
     }
 
     return 0;
