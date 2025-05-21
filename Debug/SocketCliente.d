@@ -1,3 +1,3 @@
-SocketCliente.o: ../SocketCliente.cpp ../SocketCliente.h
+SocketCliente.o: ../SocketCliente.cpp ../MenuPrincipal.h
 
-../SocketCliente.h:
+../MenuPrincipal.h:

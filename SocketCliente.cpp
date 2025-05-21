@@ -1,54 +1,59 @@
-#include "SocketCliente.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include <iostream>
-#include <cstring>
-#include <unistd.h>
-#include <arpa/inet.h>
+#include <sys/types.h>
 #include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#include <unistd.h>
+#include "MenuPrincipal.h"
 
-SocketCliente::SocketCliente(const std::string& ip, int puerto)
-    : servidorIP(ip), servidorPuerto(puerto), sockfd(-1) {}
+#define SERVER_IP "127.0.0.1"
+#define SERVER_PORT 6033
+using namespace std;
 
-SocketCliente::~SocketCliente() {
-    if (sockfd != -1) {
-        close(sockfd);
-    }
-}
+int main(int argc, char *argv[]) {
 
-bool SocketCliente::conectar() {
-    sockfd = socket(AF_INET, SOCK_STREAM, 0);
-    if (sockfd < 0) {
-        std::cerr << "Error creando socket\n";
-        return false;
-    }
+	int s;
+	struct sockaddr_in server;
+	char sendBuff[512], recvBuff[512];
 
-    sockaddr_in servidorAddr;
-    memset(&servidorAddr, 0, sizeof(servidorAddr));
-    servidorAddr.sin_family = AF_INET;
-    servidorAddr.sin_port = htons(servidorPuerto);
+	printf("\nInitialising...\n");
+	printf("Initialised.\n");
 
-    if (inet_pton(AF_INET, servidorIP.c_str(), &servidorAddr.sin_addr) <= 0) {
-        std::cerr << "Dirección IP no válida\n";
-        return false;
-    }
+	//SOCKET creation
+	if ((s = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
+		perror("Could not create socket");
+		return -1;
+	}
 
-    if (connect(sockfd, (struct sockaddr*)&servidorAddr, sizeof(servidorAddr)) < 0) {
-        std::cerr << "No se pudo conectar al servidor\n";
-        return false;
-    }
+	printf("Socket created.\n");
 
-    std::cout << "Conectado al servidor\n";
-    return true;
-}
+	server.sin_addr.s_addr = inet_addr(SERVER_IP); //INADDR_ANY;
+	server.sin_family = AF_INET;
+	server.sin_port = htons(SERVER_PORT);
 
-void SocketCliente::enviarComando(const std::string& comando) {
-    send(sockfd, comando.c_str(), comando.length(), 0);
-}
+	//CONNECT
+	if (connect(s, (struct sockaddr*) &server, sizeof(server)) < 0) {
+		perror("Connection error");
+		close(s);
+		return -1;
+	}
 
-std::string SocketCliente::recibirRespuesta() {
-    char buffer[1024] = {0};
-    int bytesRecibidos = recv(sockfd, buffer, sizeof(buffer) - 1, 0);
-    if (bytesRecibidos > 0) {
-        return std::string(buffer);
-    }
-    return "";
+	printf("Connection stablished with: %s (%d)\n", inet_ntoa(server.sin_addr),
+			ntohs(server.sin_port));
+
+	/*EMPIEZA EL PROGRAMA DEL CLIENTE*/
+	mostrarMenuPrincipal(s);
+
+	/*ACABA EL PROGRAMA DEL CLIENTE*/
+
+	// CLOSING
+	close(s);
+
+	cin.get();
+
+
+	return 0;
 }

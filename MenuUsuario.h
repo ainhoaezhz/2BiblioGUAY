@@ -1,14 +1,6 @@
-#ifndef MENUUSUARIO_H_
-#define MENUUSUARIO_H_
+#ifndef MENU_USUARIO_H
+#define MENU_USUARIO_H
 
-#include "Menu.h"
-
-class MenuUsuario : public Menu {
-public:
-    MenuUsuario();
-    virtual ~MenuUsuario();
-
-    void mostrarMenu() override;
-};
+void mostrarMenuUsuario(int socket, const char* usuario);
 
 #endif

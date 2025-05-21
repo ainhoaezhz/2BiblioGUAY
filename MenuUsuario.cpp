@@ -1,91 +1,99 @@
-
-#include "MenuUsuario.h"
-#include "SocketCliente.h"
+// MenuUsuario.cpp
 #include <iostream>
+#include <cstring>
+#include <unistd.h>
 #include <string>
+#include <sstream>
+#include <sys/types.h>
+#include <sys/socket.h>
 
-MenuUsuario::MenuUsuario() {}
-MenuUsuario::~MenuUsuario() {}
+using namespace std;
 
-void MenuUsuario::mostrarMenu() {
-    SocketCliente socket("127.0.0.1", 6000);
-    if (!socket.conectar()) {
-        std::cerr << "No se pudo conectar al servidor\n";
-        return;
-    }
+char menuUsuario() {
+    char opcionMenu;
+    cout << "----------" << endl;
+    cout << "USUARIO: MENU" << endl;
+    cout << "1. Ver perfil" << endl;
+    cout << "2. Editar perfil" << endl;
+    cout << "3. Buscar libros" << endl;
+    cout << "4. Historial de préstamos" << endl;
+    cout << "5. Devolver libros" << endl;
+    cout << "6. Listado de libros disponibles" << endl;
+    cout << "0. Salir" << endl;
+    cout << "Elige una opción: ";
+    cin >> opcionMenu;
+    cin.ignore();
 
-    char opcion;
-    do {
-        std::cout << "\n=== Menú de Usuario ===\n";
-        std::cout << "1. Ver catálogo\n";
-        std::cout << "2. Solicitar préstamo\n";
-        std::cout << "3. Devolver libro\n";
-        std::cout << "4. Registrarse\n";
-        std::cout << "0. Salir\n";
-        std::cout << "Opción: ";
-        std::cin >> opcion;
-        std::cin.ignore();
-
-        switch (opcion) {
-            case '1':
-                socket.enviarComando("VER_CATALOGO");
-                break;
-            case '2': {
-                std::string dni;
-                int idLibro;
-                std::cout << "Introduce tu DNI: ";
-                std::getline(std::cin, dni);
-                std::cout << "Introduce el ID del libro a solicitar: ";
-                std::cin >> idLibro;
-                std::cin.ignore();
-
-                std::string comando = "SOLICITAR_PRESTAMO|" + dni + "|" + std::to_string(idLibro);
-                socket.enviarComando(comando);
-                break;
-            }
-            case '3': {
-                std::string dni;
-                int idPrestamo;
-                std::cout << "Introduce tu DNI: ";
-                std::getline(std::cin, dni);
-                std::cout << "Introduce el ID del préstamo a devolver: ";
-                std::cin >> idPrestamo;
-                std::cin.ignore();
-
-                std::string comando = "DEVOLVER_LIBRO|" + dni + "|" + std::to_string(idPrestamo);
-                socket.enviarComando(comando);
-                break;
-            }
-            case '4': {
-                std::string nombre, apellidos, dni, direccion, email, telefono, contrasena;
-
-                std::cout << "Nombre: ";
-                std::getline(std::cin, nombre);
-                std::cout << "Apellidos: ";
-                std::getline(std::cin, apellidos);
-                std::cout << "DNI: ";
-                std::getline(std::cin, dni);
-                std::cout << "Dirección: ";
-                std::getline(std::cin, direccion);
-                std::cout << "Email: ";
-                std::getline(std::cin, email);
-                std::cout << "Teléfono: ";
-                std::getline(std::cin, telefono);
-                std::cout << "Contraseña: ";
-                std::getline(std::cin, contrasena);
-
-                std::string comando = "REGISTRAR_USUARIO|" + nombre + "|" + apellidos + "|" + dni + "|" +
-                                      direccion + "|" + email + "|" + telefono + "|" + contrasena;
-
-                socket.enviarComando(comando);
-                break;
-            }
-        }
-
-        if (opcion != '0') {
-            std::string respuesta = socket.recibirRespuesta();
-            std::cout << "Servidor: " << respuesta << "\n";
-        }
-
-    } while (opcion != '0');
+    return opcionMenu;
 }
+
+void mostrarMenuUsuario(int socket, const char* usuario) {
+    char opcionMenu;
+
+    while (true) {  // Bucle continuo hasta que el usuario elija salir
+        opcionMenu = menuUsuario();
+
+        string comando;
+
+        switch (opcionMenu) {
+            case '1':
+                cout << "Viendo perfil...\n";
+                comando = string("VER_PERFIL|") + usuario;
+                break;
+            case '2':
+                cout << "Editando perfil...\n";
+                comando = string("EDITAR_PERFIL|") + usuario;
+                break;
+            case '3': {
+                cout << "Buscando libros...\n";
+                cout << "Introduzca el título del libro: ";
+                string titulo;
+                cin.ignore();
+                getline(cin, titulo);
+                comando = "BUSCAR_LIBRO|" + titulo;
+                break;
+            }
+            case '4':
+                cout << "Historial de préstamos...\n";
+                comando = string("HISTORIAL|") + usuario;
+                break;
+            case '5': {
+                cout << "Devolviendo libros...\n";
+                string idPrestamo;
+                cout << "ID del préstamo a devolver: ";
+                cin >> idPrestamo;
+                cin.ignore();
+                comando = string("DEVOLVER|") + idPrestamo;
+                break;
+            }
+            case '6':
+                cout << "Listando libros disponibles...\n";
+                comando = "LISTAR_LIBROS";
+                break;
+            case '0':
+                cout << "Saliendo...\n";
+                send(socket, "SALIR", strlen("SALIR"), 0);  // Avisa al servidor que va a salir
+                return;  // Termina la función para cerrar el flujo
+            default:
+                cout << "ERROR! Opción incorrecta\n";
+                continue;  // Continúa el bucle sin salir si la opción es incorrecta
+        }
+
+        // Enviar comando
+        if (send(socket, comando.c_str(), comando.length(), 0) < 0) {
+            perror("Error al enviar datos al servidor");
+            return;
+        }
+
+        // Recibir y mostrar respuesta
+        char respuesta[1024];
+        int bytes = recv(socket, respuesta, sizeof(respuesta) - 1, 0);
+        if (bytes > 0) {
+            respuesta[bytes] = '\0';
+            cout << "\n🟢 Respuesta del servidor:\n" << respuesta << "\n";
+        } else {
+            cout << "\n🔴 Error al recibir respuesta del servidor.\n";
+        }
+    }
+}
+

@@ -1,14 +1,6 @@
-#ifndef MENUADMIN_H_
-#define MENUADMIN_H_
+#ifndef MENU_ADMIN_H
+#define MENU_ADMIN_H
 
-#include "Menu.h"
-
-class MenuAdmin : public Menu {
-public:
-    MenuAdmin();
-    virtual ~MenuAdmin();
-
-    void mostrarMenu() override;
-};
+void mostrarMenuAdmin(int socket, const char* usuario);
 
 #endif
