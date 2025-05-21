@@ -10,7 +10,7 @@
 #include "MenuPrincipal.h"
 
 #define SERVER_IP "127.0.0.1"
-#define SERVER_PORT 6033
+#define SERVER_PORT 6035
 using namespace std;
 
 int main(int argc, char *argv[]) {
