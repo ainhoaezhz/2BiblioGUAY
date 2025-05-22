@@ -40,10 +40,18 @@ void mostrarMenuUsuario(int socket, const char* usuario) {
                 cout << "Viendo perfil...\n";
                 comando = string("VER_PERFIL|") + usuario;
                 break;
-            case '2':
+            case '2': {
                 cout << "Editando perfil...\n";
-                comando = string("EDITAR_PERFIL|") + usuario;
+                string campo, nuevoValor;
+                cout << "Campo a editar (nombre, apellidos, direccion, email, telefono, contrasena): ";
+                cin.ignore();
+                getline(cin, campo);
+                cout << "Nuevo valor: ";
+                getline(cin, nuevoValor);
+                comando = "EDITAR_USUARIO|" + string(usuario) + "|" + campo + "|" + nuevoValor;
                 break;
+            }
+
             case '3': {
                 cout << "Buscando libros...\n";
                 cout << "Introduzca el título del libro: ";
