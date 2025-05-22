@@ -10,14 +10,14 @@
 #include "MenuPrincipal.h"
 
 #define SERVER_IP "127.0.0.1"
-#define SERVER_PORT 6035
+#define SERVER_PORT 6037
 using namespace std;
 
 int main(int argc, char *argv[]) {
 
 	int s;
 	struct sockaddr_in server;
-	char sendBuff[512], recvBuff[512];
+	//char sendBuff[512], recvBuff[512];
 
 	printf("\nInitialising...\n");
 	printf("Initialised.\n");

@@ -38,7 +38,6 @@ void gestionarInventarioLibros(int s) {
         string comando;
 
         if (opcion == 'a') {
-            // Pedir datos para añadir libro
             string titulo, autor, genero;
             cout << "Introduzca título: ";
             getline(cin, titulo);
@@ -47,24 +46,21 @@ void gestionarInventarioLibros(int s) {
             cout << "Introduzca género: ";
             getline(cin, genero);
 
-            // Construir mensaje completo
             comando = "AGREGAR_LIBRO|" + titulo + "|" + autor + "|" + genero;
 
-            // Enviar y recibir respuesta
             send(s, comando.c_str(), comando.length(), 0);
 
             char respuesta[1024];
             int bytes = recv(s, respuesta, sizeof(respuesta) - 1, 0);
             if (bytes > 0) {
                 respuesta[bytes] = '\0';
-                cout << "\n🟢 Respuesta del servidor:\n" << respuesta << "\n";
+                cout << "\nRespuesta del servidor:\n" << respuesta << "\n";
             } else {
                 cout << "Error recibiendo respuesta del servidor.\n";
             }
-            continue; // Volver a mostrar menú
+            continue;
         }
         else if (opcion == 'b') {
-            // Pedir datos para editar libro
             string id, titulo, autor, genero;
             cout << "Introduzca ID del libro a editar: ";
             getline(cin, id);
@@ -82,7 +78,7 @@ void gestionarInventarioLibros(int s) {
             int bytes = recv(s, respuesta, sizeof(respuesta) - 1, 0);
             if (bytes > 0) {
                 respuesta[bytes] = '\0';
-                cout << "\n🟢 Respuesta del servidor:\n" << respuesta << "\n";
+                cout << "\n Respuesta del servidor:\n" << respuesta << "\n";
             } else {
                 cout << "Error recibiendo respuesta del servidor.\n";
             }
@@ -100,7 +96,7 @@ void gestionarInventarioLibros(int s) {
             int bytes = recv(s, respuesta, sizeof(respuesta) - 1, 0);
             if (bytes > 0) {
                 respuesta[bytes] = '\0';
-                cout << "\n🟢 Respuesta del servidor:\n" << respuesta << "\n";
+                cout << "\n Respuesta del servidor:\n" << respuesta << "\n";
             } else {
                 cout << "Error recibiendo respuesta del servidor.\n";
             }
@@ -185,7 +181,7 @@ void gestionarUsuarios(int s) {
         int bytes = recv(s, respuesta, sizeof(respuesta) - 1, 0);
         if (bytes > 0) {
             respuesta[bytes] = '\0';
-            cout << "\n🟢 Respuesta del servidor:\n" << respuesta << "\n";
+            cout << "\n Respuesta del servidor:\n" << respuesta << "\n";
         } else {
             cout << "Error recibiendo respuesta del servidor.\n";
         }
@@ -245,7 +241,7 @@ void gestionarPrestamosDevoluciones(int s) {
         int bytes = recv(s, respuesta, sizeof(respuesta) - 1, 0);
         if (bytes > 0) {
             respuesta[bytes] = '\0';
-            cout << "\n🟢 Respuesta del servidor:\n" << respuesta << "\n";
+            cout << "\n Respuesta del servidor:\n" << respuesta << "\n";
         } else {
             cout << "Error recibiendo respuesta del servidor.\n";
         }
@@ -295,7 +291,7 @@ void generarInformes(int s) {
         int bytes = recv(s, respuesta, sizeof(respuesta) - 1, 0);
         if (bytes > 0) {
             respuesta[bytes] = '\0';
-            cout << "\n🟢 Respuesta del servidor:\n" << respuesta << "\n";
+            cout << "\n Respuesta del servidor:\n" << respuesta << "\n";
         } else {
             cout << "Error recibiendo respuesta del servidor.\n";
         }

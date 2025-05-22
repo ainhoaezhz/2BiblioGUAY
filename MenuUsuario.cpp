@@ -30,7 +30,7 @@ char menuUsuario() {
 void mostrarMenuUsuario(int socket, const char* usuario) {
     char opcionMenu;
 
-    while (true) {  // Bucle continuo hasta que el usuario elija salir
+    while (true) {
         opcionMenu = menuUsuario();
 
         string comando;
@@ -72,27 +72,25 @@ void mostrarMenuUsuario(int socket, const char* usuario) {
                 break;
             case '0':
                 cout << "Saliendo...\n";
-                send(socket, "SALIR", strlen("SALIR"), 0);  // Avisa al servidor que va a salir
-                return;  // Termina la función para cerrar el flujo
+                send(socket, "SALIR", strlen("SALIR"), 0);
+                return;
             default:
                 cout << "ERROR! Opción incorrecta\n";
-                continue;  // Continúa el bucle sin salir si la opción es incorrecta
+                continue;
         }
 
-        // Enviar comando
         if (send(socket, comando.c_str(), comando.length(), 0) < 0) {
             perror("Error al enviar datos al servidor");
             return;
         }
 
-        // Recibir y mostrar respuesta
         char respuesta[1024];
         int bytes = recv(socket, respuesta, sizeof(respuesta) - 1, 0);
         if (bytes > 0) {
             respuesta[bytes] = '\0';
-            cout << "\n🟢 Respuesta del servidor:\n" << respuesta << "\n";
+            cout << "\n Respuesta del servidor:\n" << respuesta << "\n";
         } else {
-            cout << "\n🔴 Error al recibir respuesta del servidor.\n";
+            cout << "\n Error al recibir respuesta del servidor.\n";
         }
     }
 }
