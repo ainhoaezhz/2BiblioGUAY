@@ -55,7 +55,7 @@ void iniciarSesion(int socket) {
     do {
         cout << "\nINICIO DE SESIÓN\n";
         cout << "--------------\n";
-        cout << "Usuario: ";
+        cout << "DNI: ";
         cin >> usuario;
         cout << "Contraseña: ";
         cin >> contrasena;
